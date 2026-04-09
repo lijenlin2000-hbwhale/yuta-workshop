@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>猶他大師 QR Code</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #fff; font-family: 'Noto Sans TC', sans-serif; padding: 2rem; }
+  .page { max-width: 800px; margin: 0 auto; }
+  h1 { font-size: 1.4rem; text-align: center; margin-bottom: .3rem; letter-spacing: .1em; }
+  .sub { text-align: center; font-size: .85rem; color: #666; margin-bottom: 2rem; }
+  .cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+  .card { border: 2px solid #c4864a; border-radius: 12px; padding: 1.2rem; text-align: center; }
+  .card-title { font-size: 1rem; font-weight: 600; color: #7a4f2a; letter-spacing: .08em; margin-bottom: .3rem; }
+  .card-sub { font-size: .72rem; color: #888; margin-bottom: .8rem; }
+  .qr-wrap { display: flex; justify-content: center; margin-bottom: .8rem; }
+  .url { font-size: .6rem; color: #aaa; word-break: break-all; }
+  .instructions { margin-top: 2rem; border: 1px solid #e0d0c0; border-radius: 8px; padding: 1rem 1.2rem; background: #fdf8f2; }
+  .instructions h2 { font-size: .9rem; color: #7a4f2a; margin-bottom: .6rem; }
+  .instructions ol { padding-left: 1.2rem; }
+  .instructions li { font-size: .8rem; color: #555; line-height: 1.8; }
+  .setup-note { margin-top: 1.5rem; border: 2px dashed #c4864a; border-radius: 8px; padding: 1rem 1.2rem; background: #fffbf5; }
+  .setup-note h2 { font-size: .9rem; color: #c4864a; margin-bottom: .6rem; }
+  .setup-note ol { padding-left: 1.2rem; }
+  .setup-note li { font-size: .8rem; color: #555; line-height: 1.8; }
+  .setup-note code { background: #f0e8dc; padding: .1em .4em; border-radius: 3px; font-size: .85em; }
+  @media print {
+    body { padding: .5rem; }
+    .instructions { page-break-inside: avoid; }
+    .setup-note { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>猶他大師 · 傳承者的試煉</h1>
+  <div class="sub">掃描 QR Code 直接進入，不需要輸入密碼</div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-title">學生介面</div>
+      <div class="card-sub">各組平板掃描此碼</div>
+      <div class="qr-wrap"><div id="qr-student"></div></div>
+      <div class="url" id="url-student"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">老師儀表板</div>
+      <div class="card-sub">老師裝置掃描此碼</div>
+      <div class="qr-wrap"><div id="qr-teacher"></div></div>
+      <div class="url" id="url-teacher"></div>
+    </div>
+  </div>
+
+  <div class="instructions">
+    <h2>現場操作步驟</h2>
+    <ol>
+      <li>各組平板掃描左側 QR Code，直接進入選組頁面</li>
+      <li>每組選擇自己的組別，按「召喚猶他大師」</li>
+      <li>老師裝置掃描右側 QR Code，進入監控儀表板（需輸入通關密語）</li>
+      <li>工作坊開始前，老師可在儀表板按「清除所有對話記錄」重置</li>
+    </ol>
+  </div>
+
+  <div class="setup-note">
+    <h2>⚙️ 使用前設定（列印前請先完成，此區塊列印時不顯示）</h2>
+    <ol>
+      <li>將 <code>YOUR_BASE64_ENCODED_API_KEY</code> 替換為你的 Anthropic API key 的 base64 編碼字串</li>
+      <li>將 <code>YOUR_GITHUB_USERNAME</code> 替換為你的 GitHub 帳號名稱</li>
+      <li>確認替換完成後，將此檔案存為 <code>yuta_qrcode.html</code>（注意：不要上傳至 GitHub）</li>
+      <li>在瀏覽器開啟確認 QR code 正確生成後，列印 A4 備用</li>
+      <li>列印完成後刪除本機的 <code>yuta_qrcode.html</code>，僅保留此範本</li>
+    </ol>
+  </div>
+</div>
+
+<script>
+// ⚠️ 以下兩個變數需要在使用前替換，替換完成後另存為 yuta_qrcode.html
+// ⚠️ Replace the two variables below before use, then save as yuta_qrcode.html
+
+const BASE = 'https://YOUR_GITHUB_USERNAME.github.io/yuta-workshop';
+const KEY = 'YOUR_BASE64_ENCODED_API_KEY';
+
+const studentURL = `${BASE}/yuta_student.html?key=${KEY}`;
+const teacherURL = `${BASE}/yuta_teacher.html`;
+
+document.getElementById('url-student').textContent = studentURL;
+document.getElementById('url-teacher').textContent = teacherURL;
+
+new QRCode(document.getElementById('qr-student'), {
+  text: studentURL, width: 200, height: 200,
+  colorDark: '#7a4f2a', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M
+});
+
+new QRCode(document.getElementById('qr-teacher'), {
+  text: teacherURL, width: 200, height: 200,
+  colorDark: '#3a3a3a', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M
+});
+</script>
+</body>
+</html>
