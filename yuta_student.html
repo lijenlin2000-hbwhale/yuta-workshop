@@ -309,7 +309,21 @@ function showScreen(name) {
   ['login','group','chat'].forEach(s => { document.getElementById('screen-'+s).style.display='none'; });
   document.getElementById('screen-'+name).style.display = name==='chat'?'flex':'block';
 }
-showScreen('login');
+
+// 自動讀取網址參數 ?key=... 跳過登入畫面
+const urlKey = new URLSearchParams(window.location.search).get('key');
+if (urlKey) {
+  try {
+    const decoded = atob(urlKey);
+    if (!decoded.startsWith('sk-ant-')) throw new Error();
+    apiKey = decoded;
+    showScreen('group');
+  } catch {
+    showScreen('login');
+  }
+} else {
+  showScreen('login');
+}
 </script>
 </body>
 </html>
