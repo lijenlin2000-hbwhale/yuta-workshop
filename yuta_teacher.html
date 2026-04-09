@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>猶他大師｜老師儀表板</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#1a1612;--bg2:#221e19;--bg3:#2c2620;--surface:#332d26;--surface2:#3d3630;
+    --border:rgba(196,134,74,0.15);--border2:rgba(196,134,74,0.3);
+    --accent:#c4864a;--accent-dim:#8a5a2a;--accent-glow:rgba(196,134,74,0.2);
+    --ink:#f0e8d8;--ink-soft:#c4b89a;--ink-faint:#8a7a6a;
+    --red:#c45a4a;--red-bg:rgba(196,90,74,0.1);
+    --green:#5a9a6a;--green-bg:rgba(90,154,106,0.1);
+    --amber:#c4a44a;--amber-bg:rgba(196,164,74,0.1);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--ink);font-family:'Noto Sans TC',sans-serif;min-height:100vh;}
+
+  /* Login */
+  #screen-login{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:2rem;}
+  .login-box{width:100%;max-width:380px;text-align:center;}
+  .login-seal{width:64px;height:64px;margin:0 auto 1.2rem;border-radius:50%;background:var(--surface);border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:'Noto Serif TC',serif;font-size:1.6rem;color:var(--accent);box-shadow:0 0 20px var(--accent-glow);}
+  .login-title{font-family:'Noto Serif TC',serif;font-size:1.3rem;color:var(--ink);letter-spacing:.12em;margin-bottom:.3rem;}
+  .login-sub{font-size:.75rem;color:var(--ink-faint);letter-spacing:.08em;margin-bottom:1.8rem;}
+  .field input{width:100%;padding:.75rem 1rem;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-family:'Noto Sans TC',sans-serif;font-size:.88rem;color:var(--ink);outline:none;margin-bottom:.8rem;transition:border-color .2s;}
+  .field input:focus{border-color:var(--accent);}
+  .field input::placeholder{color:var(--ink-faint);}
+  .btn{width:100%;padding:.75rem;background:var(--accent-dim);color:var(--ink);border:1px solid var(--border2);border-radius:8px;font-family:'Noto Sans TC',sans-serif;font-size:.9rem;font-weight:500;cursor:pointer;transition:background .2s;letter-spacing:.08em;}
+  .btn:hover{background:var(--accent);}
+  .err{font-size:.75rem;color:var(--red);margin-top:.4rem;min-height:1.1em;}
+
+  /* Dashboard */
+  #screen-dash{display:none;flex-direction:column;height:100vh;}
+  .topbar{padding:.7rem 1.2rem;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.8rem;flex-shrink:0;}
+  .topbar-seal{width:30px;height:30px;border-radius:50%;background:var(--surface);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:'Noto Serif TC',serif;font-size:.9rem;color:var(--accent);}
+  .topbar-title{font-family:'Noto Serif TC',serif;font-size:.95rem;color:var(--ink);letter-spacing:.08em;}
+  .topbar-sub{font-size:.7rem;color:var(--ink-faint);}
+  .topbar-spacer{flex:1;}
+  .online-count{font-size:.72rem;color:var(--green);background:var(--green-bg);padding:.2rem .6rem;border-radius:10px;border:1px solid rgba(90,154,106,0.2);}
+
+  .dash-body{flex:1;overflow:hidden;display:flex;gap:0;}
+
+  /* Groups grid */
+  .groups-panel{flex:1;overflow:hidden;padding:1rem;}
+  .groups-grid{display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(2,1fr);gap:.75rem;height:100%;}
+
+  .group-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;transition:border-color .2s;cursor:pointer;display:flex;flex-direction:column;}
+  .group-card:hover{border-color:var(--border2);}
+  .group-card.flagged{border-color:var(--red);background:var(--red-bg);}
+  .group-card.active{border-color:var(--accent);}
+
+  .card-header{padding:.6rem .9rem;display:flex;align-items:center;gap:.5rem;border-bottom:1px solid var(--border);}
+  .card-num{width:26px;height:26px;border-radius:50%;background:var(--surface);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:'Noto Serif TC',serif;font-size:.75rem;color:var(--accent);flex-shrink:0;}
+  .card-name{font-size:.82rem;font-weight:500;color:var(--ink);flex:1;}
+  .card-status{font-size:.65rem;color:var(--ink-faint);}
+  .card-status.online{color:var(--green);}
+  .flag-btn{padding:.2rem .5rem;border-radius:6px;border:1px solid var(--border);background:transparent;font-size:.65rem;cursor:pointer;color:var(--ink-faint);transition:all .2s;}
+  .flag-btn:hover,.flag-btn.on{background:var(--red-bg);border-color:var(--red);color:var(--red);}
+
+  .card-msgs{padding:.6rem .9rem;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:.35rem;}
+  .card-msgs::-webkit-scrollbar{width:3px;}.card-msgs::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+  .card-msg{font-size:.72rem;line-height:1.5;color:var(--ink-soft);}
+  .card-msg .role-u{color:var(--ink-faint);}
+  .card-msg .role-a{color:var(--accent);}
+  .card-empty{font-size:.7rem;color:var(--ink-faint);font-style:italic;padding:.3rem 0;}
+
+  /* Side panel */
+  .side-panel{width:280px;flex-shrink:0;background:var(--bg2);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+  .side-section{padding:.8rem 1rem;border-bottom:1px solid var(--border);}
+  .side-label{font-size:.68rem;color:var(--ink-faint);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.6rem;}
+
+  /* Broadcast */
+  .broadcast-input{width:100%;padding:.6rem .8rem;background:var(--surface);border:1px solid var(--border);border-radius:7px;font-family:'Noto Sans TC',sans-serif;font-size:.8rem;color:var(--ink);outline:none;resize:none;line-height:1.5;margin-bottom:.5rem;}
+  .broadcast-input:focus{border-color:var(--accent);}
+  .broadcast-input::placeholder{color:var(--ink-faint);}
+  .btn-broadcast{width:100%;padding:.55rem;background:var(--accent-dim);color:var(--ink);border:1px solid var(--border2);border-radius:7px;font-family:'Noto Sans TC',sans-serif;font-size:.8rem;cursor:pointer;transition:background .2s;letter-spacing:.06em;}
+  .btn-broadcast:hover{background:var(--accent);}
+  .broadcast-confirm{font-size:.7rem;color:var(--green);margin-top:.4rem;min-height:1em;text-align:center;}
+
+  /* Quick broadcasts */
+  .quick-broadcasts{display:flex;flex-direction:column;gap:.35rem;margin-top:.5rem;}
+  .qb-btn{padding:.4rem .7rem;background:var(--surface);border:1px solid var(--border);border-radius:6px;font-size:.72rem;color:var(--ink-soft);cursor:pointer;text-align:left;transition:all .2s;font-family:'Noto Sans TC',sans-serif;}
+  .qb-btn:hover{background:var(--surface2);border-color:var(--border2);color:var(--ink);}
+  .qb-pause{background:var(--accent-dim);border-color:var(--border2);color:var(--ink);font-weight:500;}
+  .qb-pause.paused{background:var(--green);border-color:var(--green);color:#fff;}
+
+  /* Flag summary */
+  .flag-list{display:flex;flex-direction:column;gap:.3rem;}
+  .flag-item{padding:.35rem .6rem;background:var(--red-bg);border:1px solid rgba(196,90,74,0.2);border-radius:6px;font-size:.72rem;color:var(--red);display:flex;justify-content:space-between;align-items:center;}
+  .flag-clear{background:transparent;border:none;color:var(--ink-faint);cursor:pointer;font-size:.65rem;padding:.1rem .3rem;}
+  .flag-clear:hover{color:var(--red);}
+  .btn-clear{width:100%;padding:.55rem;background:transparent;color:var(--red);border:1px solid rgba(196,90,74,0.3);border-radius:7px;font-family:'Noto Sans TC',sans-serif;font-size:.8rem;cursor:pointer;transition:all .2s;letter-spacing:.06em;}
+  .btn-clear:hover{background:var(--red-bg);border-color:var(--red);}
+  .clear-confirm{font-size:.7rem;margin-top:.4rem;min-height:1em;text-align:center;}
+
+  /* Activity log */
+  .activity-log{flex:1;overflow-y:auto;padding:.5rem 0;}
+  .activity-log::-webkit-scrollbar{width:3px;}.activity-log::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+  .log-item{padding:.35rem 1rem;font-size:.68rem;color:var(--ink-faint);border-bottom:1px solid rgba(196,134,74,0.05);line-height:1.4;}
+  .log-item .log-group{color:var(--accent-dim);}
+  .log-item .log-time{float:right;font-size:.62rem;}
+</style>
+</head>
+<body>
+
+<!-- Login -->
+<div id="screen-login">
+  <div class="login-box">
+    <div class="login-seal">師</div>
+    <div class="login-title">老師儀表板</div>
+    <div class="login-sub">傳承者的試煉 · 監控中心</div>
+    <div class="field">
+      <input type="password" id="pw-input" placeholder="輸入通關密語（同學生端）" autocomplete="off"/>
+    </div>
+    <button class="btn" onclick="doLogin()">進入監控中心</button>
+    <div class="err" id="login-err"></div>
+  </div>
+</div>
+
+<!-- Dashboard -->
+<div id="screen-dash">
+  <div class="topbar">
+    <div class="topbar-seal">師</div>
+    <div>
+      <div class="topbar-title">猶他大師 · 老師監控</div>
+      <div class="topbar-sub">傳承者的試煉</div>
+    </div>
+    <div class="topbar-spacer"></div>
+    <div class="online-count" id="online-count">連線中 0 組</div>
+  </div>
+
+  <div class="dash-body">
+    <!-- Groups grid -->
+    <div class="groups-panel">
+      <div class="groups-grid" id="groups-grid"></div>
+    </div>
+
+    <!-- Side panel -->
+    <div class="side-panel">
+      <!-- Broadcast -->
+      <div class="side-section">
+        <div class="side-label">廣播給全場</div>
+        <textarea class="broadcast-input" id="broadcast-input" rows="3" placeholder="輸入要傳給所有組的訊息…"></textarea>
+        <button class="btn-broadcast" onclick="sendBroadcast()">傳送給所有組</button>
+        <div class="broadcast-confirm" id="broadcast-confirm"></div>
+        <div class="quick-broadcasts">
+          <button class="qb-btn qb-pause" id="pause-btn" onclick="togglePause()">⏸ 暫停所有組</button>
+          <button class="qb-btn" onclick="quickBroadcast('五分鐘後請各組準備分享。')">⏱ 五分鐘後分享</button>
+        </div>
+      </div>
+
+      <!-- Flags -->
+      <div class="side-section">
+        <div class="side-label">旗標組別</div>
+        <div class="flag-list" id="flag-list">
+          <div class="no-flags">目前沒有旗標</div>
+        </div>
+      </div>
+
+      <!-- Clear -->
+      <div class="side-section">
+        <div class="side-label">資料管理</div>
+        <button class="btn-clear" onclick="confirmClear()">🗑 清除所有對話記錄</button>
+        <div class="clear-confirm" id="clear-confirm"></div>
+      </div>
+
+      <!-- Activity -->
+      <div class="side-label" style="padding:.8rem 1rem .3rem">最近活動</div>
+      <div class="activity-log" id="activity-log"></div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, onValue, set, push, serverTimestamp, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyCYVRAMUC4_lBA1-yonNj3Kkj24EuBXM7w",
+  authDomain: "yuta-workshop.firebaseapp.com",
+  databaseURL: "https://yuta-workshop-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "yuta-workshop",
+  storageBucket: "yuta-workshop.firebasestorage.app",
+  messagingSenderId: "316454084836",
+  appId: "1:316454084836:web:ec79be295ea6987da18cf1"
+};
+
+const GROUP_NAMES = ['','第一組','第二組','第三組','第四組','第五組','第六組','第七組','第八組'];
+const NUM = ['','一','二','三','四','五','六','七','八'];
+let db, flaggedGroups = new Set(), groupMessages = {}, activityItems = [];
+let isPaused = false;
+
+const app = initializeApp(FIREBASE_CONFIG);
+db = getDatabase(app);
+
+window.doLogin = function() {
+  const pw = document.getElementById('pw-input').value.trim();
+  const err = document.getElementById('login-err');
+  if (!pw) { err.textContent = '請輸入通關密語'; return; }
+  try {
+    const decoded = atob(pw);
+    if (!decoded.startsWith('sk-ant-')) throw new Error();
+    err.textContent = '';
+    showDash();
+  } catch { err.textContent = '通關密語不對'; }
+};
+
+document.getElementById('pw-input').addEventListener('keydown', e => { if(e.key==='Enter') window.doLogin(); });
+
+function showDash() {
+  document.getElementById('screen-login').style.display = 'none';
+  document.getElementById('screen-dash').style.display = 'flex';
+  initGroups();
+  listenAll();
+}
+
+function initGroups() {
+  const grid = document.getElementById('groups-grid');
+  grid.innerHTML = '';
+  for (let i = 1; i <= 8; i++) {
+    grid.innerHTML += `
+      <div class="group-card" id="card-${i}">
+        <div class="card-header">
+          <div class="card-num">${NUM[i]}</div>
+          <div class="card-name">${GROUP_NAMES[i]}</div>
+          <div class="card-status" id="status-${i}">等待連線</div>
+          <button class="flag-btn" id="flag-${i}" onclick="toggleFlag(${i})">⚑ 旗標</button>
+        </div>
+        <div class="card-msgs" id="msgs-${i}">
+          <div class="card-empty">尚無對話</div>
+        </div>
+      </div>`;
+  }
+}
+
+function listenAll() {
+  let onlineCount = 0;
+  for (let i = 1; i <= 8; i++) {
+    const gRef = ref(db, `groups/group${i}`);
+    onValue(gRef, snap => {
+      const data = snap.val();
+      if (!data) return;
+      // Update last active status
+      if (data.lastActive) {
+        const el = document.getElementById('status-' + i);
+        if (el) { el.textContent = '活躍中'; el.className = 'card-status online'; }
+        document.getElementById('card-' + i)?.classList.add('active');
+      }
+      // Update messages
+      if (data.messages) {
+        const msgs = Object.values(data.messages);
+        groupMessages[i] = msgs;
+        renderGroupMsgs(i, msgs);
+        // Log latest
+        const last = msgs[msgs.length - 1];
+        if (last && last.role === 'user') addLog(i, last.content);
+      }
+      // Update online count
+      updateOnlineCount();
+    });
+  }
+}
+
+function updateOnlineCount() {
+  let count = 0;
+  for (let i = 1; i <= 8; i++) {
+    if (document.getElementById('status-' + i)?.classList.contains('online')) count++;
+  }
+  document.getElementById('online-count').textContent = `連線中 ${count} 組`;
+}
+
+function renderGroupMsgs(groupNum, msgs) {
+  const el = document.getElementById('msgs-' + groupNum);
+  if (!el) return;
+  if (!msgs || msgs.length === 0) { el.innerHTML = '<div class="card-empty">尚無對話</div>'; return; }
+  const recent = msgs.slice(-8);
+  el.innerHTML = recent.map(m => {
+    const role = m.role === 'user' ? '<span class="role-u">傳承者</span>' : '<span class="role-a">猶他</span>';
+    const txt = (m.content || '').substring(0, 60) + (m.content?.length > 60 ? '…' : '');
+    return `<div class="card-msg">${role}：${escHtml(txt)}</div>`;
+  }).join('');
+  el.scrollTop = el.scrollHeight;
+}
+
+function addLog(groupNum, content) {
+  const log = document.getElementById('activity-log');
+  const time = new Date().toLocaleTimeString('zh-TW', {hour:'2-digit',minute:'2-digit'});
+  const txt = (content || '').substring(0, 30) + (content?.length > 30 ? '…' : '');
+  const item = document.createElement('div');
+  item.className = 'log-item';
+  item.innerHTML = `<span class="log-group">${GROUP_NAMES[groupNum]}</span>：${escHtml(txt)}<span class="log-time">${time}</span>`;
+  log.prepend(item);
+  if (log.children.length > 30) log.lastChild.remove();
+}
+
+window.toggleFlag = function(n) {
+  const btn = document.getElementById('flag-' + n);
+  const card = document.getElementById('card-' + n);
+  if (flaggedGroups.has(n)) {
+    flaggedGroups.delete(n);
+    btn?.classList.remove('on');
+    card?.classList.remove('flagged');
+  } else {
+    flaggedGroups.add(n);
+    btn?.classList.add('on');
+    card?.classList.add('flagged');
+  }
+  renderFlags();
+  // Save to Firebase
+  set(ref(db, `flags/group${n}`), flaggedGroups.has(n) ? true : null);
+};
+
+function renderFlags() {
+  const el = document.getElementById('flag-list');
+  if (flaggedGroups.size === 0) {
+    el.innerHTML = '<div class="no-flags">目前沒有旗標</div>';
+    return;
+  }
+  el.innerHTML = [...flaggedGroups].map(n => `
+    <div class="flag-item">
+      ${GROUP_NAMES[n]}
+      <button class="flag-clear" onclick="toggleFlag(${n})">✕</button>
+    </div>`).join('');
+}
+
+window.confirmClear = function() {
+  const confirm = document.getElementById('clear-confirm');
+  confirm.innerHTML = '<span style="color:var(--amber)">確定要清除？</span> <button onclick="clearAll()" style="background:var(--red);color:#fff;border:none;border-radius:4px;padding:.1rem .5rem;font-size:.7rem;cursor:pointer;margin-left:.3rem">確定</button> <button onclick="document.getElementById(\'clear-confirm\').innerHTML=\'\'" style="background:transparent;border:none;color:var(--ink-faint);font-size:.7rem;cursor:pointer;">取消</button>';
+};
+
+window.clearAll = async function() {
+  const confirm = document.getElementById('clear-confirm');
+  confirm.innerHTML = '<span style="color:var(--ink-faint)">清除中…</span>';
+  try {
+    // Clear all group messages
+    for (let i = 1; i <= 8; i++) {
+      await set(ref(db, `groups/group${i}`), null);
+      const el = document.getElementById('msgs-' + i);
+      if (el) el.innerHTML = '<div class="card-empty">尚無對話</div>';
+      const status = document.getElementById('status-' + i);
+      if (status) { status.textContent = '等待連線'; status.className = 'card-status'; }
+      document.getElementById('card-' + i)?.classList.remove('active');
+    }
+    // Clear activity log
+    document.getElementById('activity-log').innerHTML = '';
+    // Clear broadcast
+    await set(ref(db, 'broadcast'), null);
+    confirm.innerHTML = '<span style="color:var(--green)">✓ 已清除所有記錄</span>';
+    setTimeout(() => { confirm.innerHTML = ''; }, 3000);
+  } catch(e) {
+    confirm.innerHTML = '<span style="color:var(--red)">清除失敗，請再試</span>';
+  }
+};
+
+window.togglePause = function() {
+  isPaused = !isPaused;
+  set(ref(db, 'paused'), isPaused);
+  const btn = document.getElementById('pause-btn');
+  if (isPaused) {
+    btn.textContent = '▶ 繼續所有組';
+    btn.classList.add('paused');
+  } else {
+    btn.textContent = '⏸ 暫停所有組';
+    btn.classList.remove('paused');
+  }
+};
+
+window.sendBroadcast = function() {
+  const msg = document.getElementById('broadcast-input').value.trim();
+  if (!msg) return;
+  set(ref(db, 'broadcast'), { message: msg, ts: serverTimestamp() });
+  document.getElementById('broadcast-input').value = '';
+  const confirm = document.getElementById('broadcast-confirm');
+  confirm.textContent = '✓ 已傳送給所有組';
+  setTimeout(() => { confirm.textContent = ''; }, 3000);
+};
+
+window.quickBroadcast = function(msg) {
+  document.getElementById('broadcast-input').value = msg;
+  window.sendBroadcast();
+};
+
+function escHtml(s) {
+  if (!s) return '';
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+</script>
+</body>
+</html>

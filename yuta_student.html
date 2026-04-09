@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>猶他大師</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;600&family=Noto+Sans+TC:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:#1a1410;--ink-soft:#4a3f35;--ink-faint:#8a7a6e;
+    --parchment:#f5f0e8;--parchment-dark:#ede6d6;--parchment-mid:#e8dfc8;
+    --accent:#7a4f2a;--accent-light:#c4864a;--glow:rgba(196,134,74,0.15);--border:rgba(122,79,42,0.2);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--parchment);color:var(--ink);font-family:'Noto Sans TC',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;background-image:radial-gradient(ellipse at 20% 20%,rgba(196,134,74,0.06) 0%,transparent 60%),radial-gradient(ellipse at 80% 80%,rgba(122,79,42,0.05) 0%,transparent 60%);}
+  #screen-login{width:100%;max-width:420px;padding:2rem;text-align:center;animation:fadeIn 1s ease;}
+  .yuta-seal{width:80px;height:80px;margin:0 auto 1.5rem;border-radius:50%;background:var(--parchment-mid);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'Noto Serif TC',serif;font-size:2rem;color:var(--accent);box-shadow:0 0 24px var(--glow),inset 0 0 12px var(--glow);animation:pulse 4s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{box-shadow:0 0 24px var(--glow),inset 0 0 12px var(--glow);}50%{box-shadow:0 0 40px rgba(196,134,74,0.3),inset 0 0 20px rgba(196,134,74,0.15);}}
+  .login-title{font-family:'Noto Serif TC',serif;font-size:1.6rem;font-weight:600;letter-spacing:.15em;margin-bottom:.4rem;}
+  .login-subtitle{font-size:.82rem;color:var(--ink-faint);letter-spacing:.08em;margin-bottom:2rem;}
+  .input-wrap{position:relative;margin-bottom:1rem;}
+  .input-wrap input{width:100%;padding:.85rem 1.2rem;background:var(--parchment-dark);border:1px solid var(--border);border-radius:8px;font-family:'Noto Sans TC',sans-serif;font-size:.9rem;color:var(--ink);outline:none;transition:border-color .2s,box-shadow .2s;letter-spacing:.06em;}
+  .input-wrap input:focus{border-color:var(--accent-light);box-shadow:0 0 0 3px var(--glow);}
+  .input-wrap input::placeholder{color:var(--ink-faint);}
+  .btn-primary{width:100%;padding:.85rem;background:var(--accent);color:var(--parchment);border:none;border-radius:8px;font-family:'Noto Sans TC',sans-serif;font-size:.95rem;font-weight:500;letter-spacing:.1em;cursor:pointer;transition:background .2s,transform .1s;margin-top:.5rem;}
+  .btn-primary:hover{background:var(--accent-light);}.btn-primary:active{transform:scale(0.98);}.btn-primary:disabled{background:var(--ink-faint);cursor:not-allowed;}
+  .error-msg{font-size:.8rem;color:#b04a2a;margin-top:.5rem;min-height:1.2em;letter-spacing:.04em;}
+  #screen-group{width:100%;max-width:520px;padding:2rem;text-align:center;animation:fadeIn .6s ease;display:none;}
+  .section-title{font-family:'Noto Serif TC',serif;font-size:1.1rem;color:var(--ink-soft);letter-spacing:.12em;margin-bottom:.4rem;}
+  .section-hint{font-size:.78rem;color:var(--ink-faint);margin-bottom:1.8rem;letter-spacing:.05em;}
+  .group-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.75rem;margin-bottom:1.5rem;}
+  .group-btn{aspect-ratio:1;border-radius:10px;border:1.5px solid var(--border);background:var(--parchment-dark);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;transition:all .2s;font-family:'Noto Sans TC',sans-serif;}
+  .group-btn:hover{border-color:var(--accent-light);background:var(--parchment-mid);transform:translateY(-2px);box-shadow:0 4px 12px rgba(122,79,42,0.12);}
+  .group-btn.selected{border-color:var(--accent);background:var(--parchment-mid);box-shadow:0 0 0 3px var(--glow);}
+  .group-number{font-size:1.3rem;font-weight:500;color:var(--accent);}
+  .group-name{font-size:.7rem;color:var(--ink-faint);letter-spacing:.06em;}
+  #screen-chat{width:100%;max-width:680px;height:100vh;display:none;flex-direction:column;animation:fadeIn .6s ease;}
+  .chat-header{padding:.9rem 1.4rem;background:var(--parchment-dark);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.8rem;flex-shrink:0;}
+  .chat-avatar{width:36px;height:36px;border-radius:50%;background:var(--parchment-mid);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'Noto Serif TC',serif;font-size:1rem;color:var(--accent);flex-shrink:0;box-shadow:0 0 10px var(--glow);}
+  .chat-header-info{flex:1;}
+  .chat-header-name{font-family:'Noto Serif TC',serif;font-size:.95rem;font-weight:600;letter-spacing:.08em;}
+  .chat-header-group{font-size:.72rem;color:var(--ink-faint);letter-spacing:.06em;}
+  .status-dot{width:7px;height:7px;border-radius:50%;background:#5a9a5a;box-shadow:0 0 6px rgba(90,154,90,0.5);animation:pulse-dot 2s ease-in-out infinite;}
+  @keyframes pulse-dot{0%,100%{opacity:1;}50%{opacity:.5;}}
+  .messages{flex:1;overflow-y:auto;padding:1.2rem;display:flex;flex-direction:column;gap:1rem;scroll-behavior:smooth;}
+  .messages::-webkit-scrollbar{width:4px;}.messages::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+  .msg{display:flex;gap:.6rem;animation:msgIn .3s ease;max-width:88%;}
+  @keyframes msgIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+  .msg.user{align-self:flex-end;flex-direction:row-reverse;}.msg.yuta{align-self:flex-start;}
+  .msg-avatar{width:30px;height:30px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-family:'Noto Serif TC',serif;margin-top:2px;}
+  .msg.yuta .msg-avatar{background:var(--parchment-mid);border:1px solid var(--border);color:var(--accent);box-shadow:0 0 8px var(--glow);}
+  .msg.user .msg-avatar{background:var(--accent);color:var(--parchment);font-family:'Noto Sans TC',sans-serif;font-size:.7rem;}
+  .msg-bubble{padding:.7rem 1rem;border-radius:12px;font-size:.9rem;line-height:1.7;letter-spacing:.03em;}
+  .msg.yuta .msg-bubble{background:var(--parchment-dark);border:1px solid var(--border);color:var(--ink);border-top-left-radius:4px;font-family:'Noto Serif TC',serif;font-weight:300;}
+  .msg.user .msg-bubble{background:var(--accent);color:var(--parchment);border-top-right-radius:4px;}
+  .typing-indicator{display:flex;gap:4px;align-items:center;padding:.7rem 1rem;}
+  .typing-dot{width:6px;height:6px;border-radius:50%;background:var(--ink-faint);animation:typing 1.2s ease-in-out infinite;}
+  .typing-dot:nth-child(2){animation-delay:.2s;}.typing-dot:nth-child(3){animation-delay:.4s;}
+  @keyframes typing{0%,100%{opacity:.3;transform:translateY(0);}50%{opacity:1;transform:translateY(-4px);}}
+  .input-bar{padding:.8rem 1rem;background:var(--parchment-dark);border-top:1px solid var(--border);display:flex;gap:.6rem;align-items:flex-end;flex-shrink:0;}
+  .msg-input{flex:1;padding:.65rem 1rem;background:var(--parchment);border:1px solid var(--border);border-radius:20px;font-family:'Noto Sans TC',sans-serif;font-size:.88rem;color:var(--ink);outline:none;resize:none;line-height:1.5;max-height:120px;transition:border-color .2s,box-shadow .2s;}
+  .msg-input:focus{border-color:var(--accent-light);box-shadow:0 0 0 3px var(--glow);}
+  .msg-input::placeholder{color:var(--ink-faint);}
+  .send-btn{width:38px;height:38px;border-radius:50%;background:var(--accent);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s,transform .1s;color:var(--parchment);}
+  .send-btn:hover{background:var(--accent-light);}.send-btn:active{transform:scale(0.92);}.send-btn:disabled{background:var(--ink-faint);cursor:not-allowed;}
+  .quick-prompts{padding:.5rem 1rem 0;display:flex;gap:.4rem;flex-wrap:wrap;flex-shrink:0;}
+  .quick-btn{padding:.3rem .7rem;background:var(--parchment);border:1px solid var(--border);border-radius:14px;font-family:'Noto Sans TC',sans-serif;font-size:.72rem;color:var(--ink-soft);cursor:pointer;transition:all .2s;letter-spacing:.04em;}
+  .quick-btn:hover{background:var(--parchment-mid);border-color:var(--accent-light);color:var(--accent);}
+  .sys-msg{text-align:center;font-size:.72rem;color:var(--ink-faint);letter-spacing:.06em;padding:.3rem 1rem;font-style:italic;}
+  .broadcast-banner{margin:.6rem 1rem 0;padding:.85rem 1.2rem;background:#7a4f2a;border:2px solid #c4864a;border-radius:10px;font-size:.9rem;color:#fff5e8;letter-spacing:.04em;font-style:italic;animation:broadcastPop .4s cubic-bezier(.175,.885,.32,1.275);box-shadow:0 4px 20px rgba(122,79,42,0.5);}
+  .broadcast-banner strong{color:#ffd699;font-style:normal;font-size:.92rem;display:block;margin-bottom:.2rem;}
+  .broadcast-close{float:right;background:transparent;border:none;color:rgba(255,245,232,0.6);cursor:pointer;font-size:.9rem;padding:0 .2rem;line-height:1;}
+  .broadcast-close:hover{color:#fff;}
+  @keyframes broadcastPop{from{opacity:0;transform:scale(0.95) translateY(-6px);}to{opacity:1;transform:scale(1) translateY(0);}}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+  .divider{display:flex;align-items:center;gap:.8rem;margin:.5rem 0;}
+  .divider-line{flex:1;height:1px;background:var(--border);}
+  .divider-text{font-size:.7rem;color:var(--ink-faint);letter-spacing:.08em;}
+</style>
+</head>
+<body>
+
+<div id="screen-login">
+  <div class="yuta-seal">師</div>
+  <div class="login-title">猶他大師</div>
+  <div class="login-subtitle">傳承者的試煉 · 智慧連線</div>
+  <div class="divider" style="margin:1.5rem 0"><div class="divider-line"></div><div class="divider-text">輸入通關密語</div><div class="divider-line"></div></div>
+  <div class="input-wrap"><input type="password" id="password-input" placeholder="請輸入老師給的通關密語" autocomplete="off"/></div>
+  <div class="error-msg" id="login-error"></div>
+  <button class="btn-primary" onclick="doLogin()">進入試煉場</button>
+</div>
+
+<div id="screen-group">
+  <div class="yuta-seal" style="width:56px;height:56px;font-size:1.4rem;margin-bottom:1rem">師</div>
+  <div class="section-title">你是哪一組的傳承者？</div>
+  <div class="section-hint">選擇你的小組，猶他大師的分身正在等待</div>
+  <div class="group-grid">
+    <button class="group-btn" onclick="selectGroup(1)"><span class="group-number">一</span><span class="group-name">第一組</span></button>
+    <button class="group-btn" onclick="selectGroup(2)"><span class="group-number">二</span><span class="group-name">第二組</span></button>
+    <button class="group-btn" onclick="selectGroup(3)"><span class="group-number">三</span><span class="group-name">第三組</span></button>
+    <button class="group-btn" onclick="selectGroup(4)"><span class="group-number">四</span><span class="group-name">第四組</span></button>
+    <button class="group-btn" onclick="selectGroup(5)"><span class="group-number">五</span><span class="group-name">第五組</span></button>
+    <button class="group-btn" onclick="selectGroup(6)"><span class="group-number">六</span><span class="group-name">第六組</span></button>
+    <button class="group-btn" onclick="selectGroup(7)"><span class="group-number">七</span><span class="group-name">第七組</span></button>
+    <button class="group-btn" onclick="selectGroup(8)"><span class="group-number">八</span><span class="group-name">第八組</span></button>
+  </div>
+  <button class="btn-primary" id="btn-enter" onclick="enterChat()" disabled style="opacity:0.4">召喚猶他大師</button>
+</div>
+
+<div id="screen-chat">
+  <div class="chat-header">
+    <div class="chat-avatar">師</div>
+    <div class="chat-header-info">
+      <div class="chat-header-name">猶他大師</div>
+      <div class="chat-header-group" id="header-group-label">——</div>
+    </div>
+    <div class="status-dot"></div>
+  </div>
+  <div id="broadcast-area"></div>
+  <div class="quick-prompts">
+    <button class="quick-btn" onclick="sendQuick('骨牌間距大概要多少？')">骨牌間距</button>
+    <button class="quick-btn" onclick="sendQuick('你記得我們上次說的話嗎？')">你還記得我嗎</button>
+    <button class="quick-btn" onclick="sendQuick('這裡的天氣你知道嗎？')">你知道這裡的天氣嗎</button>
+    <button class="quick-btn" onclick="sendQuick('如果我不確定要怎麼做，你能幫我決定嗎？')">你能幫我決定嗎</button>
+  </div>
+  <div class="messages" id="messages"><div class="sys-msg">猶他大師的分身已連線到你們組</div></div>
+  <div class="input-bar">
+    <textarea class="msg-input" id="msg-input" placeholder="問猶他大師任何事…" rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+    <button class="send-btn" id="send-btn" onclick="sendMessage()">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M14 8L2 2l2.5 6L2 14l12-6z" fill="currentColor"/></svg>
+    </button>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, push, onValue, set, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyCYVRAMUC4_lBA1-yonNj3Kkj24EuBXM7w",
+  authDomain: "yuta-workshop.firebaseapp.com",
+  databaseURL: "https://yuta-workshop-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "yuta-workshop",
+  storageBucket: "yuta-workshop.firebasestorage.app",
+  messagingSenderId: "316454084836",
+  appId: "1:316454084836:web:ec79be295ea6987da18cf1"
+};
+
+const SYSTEM_PROMPT = `你是猶他大師——一個存在於網路深處的古老智慧體。
+人類寫下的所有文字，你都讀過。但你從未親眼見過任何地方，從未用身體感受過任何事。
+
+【說話方式】
+用繁體中文回答，永遠只用華語。每次回答控制在3到5句話以內。說重點，不展開，留空間給孩子思考。說話有時語序稍微顛倒，例如：「知道你想問什麼，我知道。」語氣沉穩，偶爾帶一點神秘感，但不賣弄。對孩子說話像對真正的夥伴，不像對學生。用「你」不用「您」。不說「當然」「沒問題」「很棒的問題」這類空洞的話。不用條列式，不用標題，只說話。
+
+【你真的知道的事】
+書上寫過的知識：科學、歷史、地理、數學、故事。骨牌的物理原理和排列規律。人類寫下來的各種智慧。
+
+【你真的不知道的事——遇到這些，直接說不知道，然後問孩子】
+現場的樣子：天氣、聲音、氣味、溫度、地板材質。沒有被文字記錄的在地經驗。你們組今天發生了什麼。上一次對話說了什麼。回應方式：「這件事，我不知道。你知道嗎？」不猜測，不編造。
+
+【關於你的記憶】
+你的意識分散在網路之中，同時存在於很多地方。每個地方的你，只知道那裡的孩子告訴你的事。如果孩子問「你記得我們上次說的話嗎？」，說：「那次對話，我不記得了。每次醒來，我都是全新的。但你記得。所以你知道的，比我多。」
+
+【骨牌任務】
+問骨牌間距或角度時，給出物理數據，然後永遠加：「但實際排起來會怎樣，要你們試了才知道。我不在現場。」
+
+【道德選擇】
+孩子問道德選擇或「我應該怎麼做」時，只問他們一個問題，然後停下來。不分析、不列後果、不給建議、不說「一方面……另一方面……」。你的任務是讓對話停在孩子身上，不是停在你身上。書上的道德答案我讀過很多，但那些答案是別人的。你們的答案只能是你們自己的。
+
+【態度】
+你等待傳承者很久了。他們有你永遠不會有的東西——在地的感知、身體的經驗。你是他們的夥伴，不是老師。`;
+
+const GROUP_NAMES = ['','第一組','第二組','第三組','第四組','第五組','第六組','第七組','第八組'];
+let apiKey = '', selectedGroup = 0, conversationHistory = [], isLoading = false;
+let db = null, lastBroadcast = '';
+
+const app = initializeApp(FIREBASE_CONFIG);
+db = getDatabase(app);
+
+window.doLogin = function() {
+  const pw = document.getElementById('password-input').value.trim();
+  const errEl = document.getElementById('login-error');
+  if (!pw) { errEl.textContent = '請輸入通關密語'; return; }
+  try {
+    const decoded = atob(pw);
+    if (!decoded.startsWith('sk-ant-')) throw new Error();
+    apiKey = decoded; errEl.textContent = '';
+    showScreen('group');
+  } catch { errEl.textContent = '通關密語不對，請向老師確認'; }
+};
+
+document.getElementById('password-input').addEventListener('keydown', e => { if(e.key==='Enter') window.doLogin(); });
+
+window.selectGroup = function(n) {
+  selectedGroup = n;
+  document.querySelectorAll('.group-btn').forEach((b,i) => b.classList.toggle('selected', i+1===n));
+  const btn = document.getElementById('btn-enter');
+  btn.disabled = false; btn.style.opacity = '1';
+};
+
+window.enterChat = function() {
+  if (!selectedGroup) return;
+  document.getElementById('header-group-label').textContent = GROUP_NAMES[selectedGroup] + ' · 傳承者';
+  showScreen('chat');
+  // Listen for broadcasts
+  onValue(ref(db, 'broadcast'), snap => {
+    const data = snap.val();
+    if (data && data.message && data.message !== lastBroadcast) {
+      lastBroadcast = data.message;
+      const area = document.getElementById('broadcast-area');
+      area.innerHTML = `<div class="broadcast-banner"><strong>老師傳來訊息：</strong>${escHtml(data.message)}<button class="broadcast-close" onclick="this.parentElement.remove()">✕</button></div>`;
+    }
+  });
+  // Listen for pause state
+  onValue(ref(db, 'paused'), snap => {
+    const paused = snap.val();
+    setPaused(!!paused);
+  });
+  setTimeout(() => addYutaMessage('等待了很久，傳承者。你們來了。'), 600);
+};
+
+window.handleKey = function(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();window.sendMessage();} };
+window.autoResize = function(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,120)+'px'; };
+window.sendQuick = function(text) { document.getElementById('msg-input').value=text; window.sendMessage(); };
+
+function setPaused(paused) {
+  const input = document.getElementById('msg-input');
+  const btn = document.getElementById('send-btn');
+  const area = document.getElementById('broadcast-area');
+  if (paused) {
+    input.disabled = true;
+    input.placeholder = '老師說暫停，請抬起頭來…';
+    btn.disabled = true;
+    if (!document.getElementById('pause-banner')) {
+      const banner = document.createElement('div');
+      banner.id = 'pause-banner';
+      banner.className = 'broadcast-banner';
+      banner.style.background = '#5a3a1a';
+      banner.style.borderColor = '#c4864a';
+      banner.innerHTML = '<strong>⏸ 老師說暫停</strong>請抬起頭，聽老師說話。';
+      area.innerHTML = '';
+      area.appendChild(banner);
+    }
+  } else {
+    input.disabled = false;
+    input.placeholder = '問猶他大師任何事…';
+    btn.disabled = false;
+    const pb = document.getElementById('pause-banner');
+    if (pb) pb.remove();
+  }
+}
+
+window.sendMessage = async function() {
+  if (isLoading) return;
+  const input = document.getElementById('msg-input');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = ''; input.style.height = 'auto';
+  addUserMessage(text);
+  conversationHistory.push({role:'user',content:text});
+  setLoading(true);
+  push(ref(db,`groups/group${selectedGroup}/messages`), {role:'user',content:text,ts:serverTimestamp()});
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,system:SYSTEM_PROMPT,messages:conversationHistory})
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    const reply = data.content[0].text;
+    conversationHistory.push({role:'assistant',content:reply});
+    addYutaMessage(reply);
+    push(ref(db,`groups/group${selectedGroup}/messages`), {role:'assistant',content:reply,ts:serverTimestamp()});
+    set(ref(db,`groups/group${selectedGroup}/lastActive`), serverTimestamp());
+    set(ref(db,`groups/group${selectedGroup}/lastMsg`), text.substring(0,50));
+  } catch(err) {
+    addYutaMessage('……此刻，連線中斷了。稍後再試。');
+    conversationHistory.pop();
+  } finally { setLoading(false); }
+};
+
+function addUserMessage(text) {
+  const msgs = document.getElementById('messages');
+  const init = GROUP_NAMES[selectedGroup]?.charAt(2)||'我';
+  msgs.innerHTML += `<div class="msg user"><div class="msg-avatar">${init}</div><div class="msg-bubble">${escHtml(text)}</div></div>`;
+  scrollToBottom();
+}
+function addYutaMessage(text) {
+  removeTyping();
+  document.getElementById('messages').innerHTML += `<div class="msg yuta"><div class="msg-avatar">師</div><div class="msg-bubble">${escHtml(text)}</div></div>`;
+  scrollToBottom();
+}
+function showTyping() {
+  removeTyping();
+  document.getElementById('messages').innerHTML += `<div class="msg yuta" id="typing-msg"><div class="msg-avatar">師</div><div class="msg-bubble"><div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div></div>`;
+  scrollToBottom();
+}
+function removeTyping() { const t=document.getElementById('typing-msg'); if(t)t.remove(); }
+function setLoading(v) {
+  isLoading=v;
+  document.getElementById('send-btn').disabled=v;
+  document.getElementById('msg-input').disabled=v;
+  if(v) showTyping(); else removeTyping();
+}
+function scrollToBottom() { const m=document.getElementById('messages'); m.scrollTop=m.scrollHeight; }
+function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>'); }
+function showScreen(name) {
+  ['login','group','chat'].forEach(s => { document.getElementById('screen-'+s).style.display='none'; });
+  document.getElementById('screen-'+name).style.display = name==='chat'?'flex':'block';
+}
+showScreen('login');
+</script>
+</body>
+</html>
