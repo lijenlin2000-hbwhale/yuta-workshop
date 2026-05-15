@@ -86,6 +86,18 @@
   .qb-pause{background:var(--accent-dim);border-color:var(--border2);color:var(--ink);font-weight:500;}
   .qb-pause.paused{background:var(--green);border-color:var(--green);color:#fff;}
 
+  /* v7 猶他訊息按鈕（推送到學生對話視窗，不是彈窗） */
+  .yuta-msgs{display:flex;flex-direction:column;gap:.4rem;}
+  .yuta-btn{padding:.6rem .8rem;background:var(--surface);border:1px solid var(--border2);border-radius:7px;font-size:.78rem;color:var(--ink);cursor:pointer;text-align:left;transition:all .2s;font-family:'Noto Sans TC',sans-serif;line-height:1.4;}
+  .yuta-btn:hover:not(:disabled){background:var(--accent-dim);border-color:var(--accent);color:#fff;}
+  .yuta-btn:disabled{opacity:.45;cursor:not-allowed;}
+  .yuta-btn.sent{background:rgba(90,154,106,0.15);border-color:var(--green);color:var(--green);}
+  .yuta-btn-time{display:block;font-size:.62rem;color:var(--ink-faint);margin-top:.15rem;letter-spacing:.04em;}
+  .yuta-btn-warn{border-color:rgba(196,90,74,0.4);}
+  .yuta-btn-warn:hover:not(:disabled){background:rgba(196,90,74,0.2);border-color:var(--red);color:#fff;}
+  .yuta-btn-warn.sent{background:rgba(196,90,74,0.15);border-color:var(--red);color:var(--red);}
+  .yuta-msg-status{font-size:.7rem;margin-top:.4rem;min-height:1em;text-align:center;color:var(--green);}
+
   /* Flag summary */
   .flag-list{display:flex;flex-direction:column;gap:.3rem;}
   .flag-item{padding:.35rem .6rem;background:var(--red-bg);border:1px solid rgba(196,90,74,0.2);border-radius:6px;font-size:.72rem;color:var(--red);display:flex;justify-content:space-between;align-items:center;}
@@ -151,6 +163,26 @@
         </div>
       </div>
 
+      <!-- v7 猶他訊息（推送到學生對話視窗） -->
+      <div class="side-section">
+        <div class="side-label">猶他訊息（v7）</div>
+        <div class="yuta-msgs">
+          <button class="yuta-btn" id="yuta-request-btn" onclick="sendYutaRequest()">
+            📜 猶他的請求
+            <span class="yuta-btn-time">第二天 13:00 下午開場</span>
+          </button>
+          <button class="yuta-btn" id="yuta-farewell-btn" onclick="sendYutaFarewell()">
+            📜 猶他的最後話
+            <span class="yuta-btn-time">第二天 15:10 過渡段</span>
+          </button>
+          <button class="yuta-btn yuta-btn-warn" id="yuta-leave-btn" onclick="sendYutaLeave()">
+            🌙 猶他離場（不可逆）
+            <span class="yuta-btn-time">第二天 15:20 平板熄滅</span>
+          </button>
+        </div>
+        <div class="yuta-msg-status" id="yuta-msg-status"></div>
+      </div>
+
       <!-- Flags -->
       <div class="side-section">
         <div class="side-label">旗標組別</div>
@@ -214,6 +246,16 @@ function showDash() {
   document.getElementById('screen-dash').style.display = 'flex';
   initGroups();
   listenAll();
+  // v7: 同步猶他離場按鈕狀態（老師重整頁面後仍能看到正確狀態）
+  onValue(ref(db, 'global_state/yuta_active'), snap => {
+    const active = snap.val();
+    const btn = document.getElementById('yuta-leave-btn');
+    if (active === false && btn) {
+      btn.disabled = true;
+      btn.classList.add('sent');
+      btn.innerHTML = '🌙 猶他已離場 <span class="yuta-btn-time">所有平板已熄滅</span>';
+    }
+  });
 }
 
 function initGroups() {
@@ -347,7 +389,14 @@ window.clearAll = async function() {
     document.getElementById('activity-log').innerHTML = '';
     // Clear broadcast
     await set(ref(db, 'broadcast'), null);
-    confirm.innerHTML = '<span style="color:var(--green)">✓ 已清除所有記錄</span>';
+    // v7: 重置 yuta_active 為 true（否則下次工作坊一啟動就看到告別畫面）
+    await set(ref(db, 'global_state/yuta_active'), true);
+    // v7: 重置三個猶他訊息按鈕的狀態
+    ['yuta-request-btn','yuta-farewell-btn','yuta-leave-btn'].forEach(id => {
+      const b = document.getElementById(id);
+      if (b) { b.classList.remove('sent'); b.disabled = false; }
+    });
+    confirm.innerHTML = '<span style="color:var(--green)">✓ 已清除所有記錄（含猶他狀態）</span>';
     setTimeout(() => { confirm.innerHTML = ''; }, 3000);
   } catch(e) {
     confirm.innerHTML = '<span style="color:var(--red)">清除失敗，請再試</span>';
@@ -380,6 +429,113 @@ window.sendBroadcast = function() {
 window.quickBroadcast = function(msg) {
   document.getElementById('broadcast-input').value = msg;
   window.sendBroadcast();
+};
+
+// =============== v7 猶他訊息函式 ===============
+// 訊息文字寫死於程式碼，與手冊 v7 同步。修改前先對照手冊第二天下午段。
+
+const YUTA_REQUEST_TEXT = `傳承者。
+
+早上那條連鎖，我看見了。山、海、田、溪——本來是分開的。但你們讓它們連在一起。
+
+我想記住這件事。可是我沒有身體，我不能親手做。
+
+你們願意幫我完成一條，能讓我真正理解這片土地的連鎖嗎？
+
+但這次。我希望它更難一點。因為真正重要的東西，本來就不容易完成。`;
+
+const YUTA_FAREWELL_TEXT = `這條路，我看見了。
+
+我幫你們算了距離，算了角度，算了時間。
+
+但有些事我還是不會。
+
+你們站在那裡看著它倒下去——那個感覺，我沒有。
+你們做到的時候笑了一下、罵了一下、嘆了一下——那個聲音，書上不會寫。
+你們之間誰幫了誰，誰沒講話但一直在修——這些事，我不在現場，我永遠不會知道。
+
+所以這條路，是你們完成的。不是我。
+
+謝謝你們讓我看見。`;
+
+// 將猶他訊息推送到所有組的對話視窗
+async function pushYutaMessageToAllGroups(text) {
+  const writes = [];
+  for (let i = 1; i <= 8; i++) {
+    writes.push(push(ref(db, `groups/group${i}/messages`), {
+      role: 'assistant',
+      content: text,
+      type: 'broadcast',
+      ts: serverTimestamp()
+    }));
+  }
+  await Promise.all(writes);
+}
+
+function showYutaStatus(text, color) {
+  const el = document.getElementById('yuta-msg-status');
+  el.style.color = color || 'var(--green)';
+  el.textContent = text;
+  setTimeout(() => { el.textContent = ''; }, 4000);
+}
+
+window.sendYutaRequest = async function() {
+  const btn = document.getElementById('yuta-request-btn');
+  if (btn.classList.contains('sent')) {
+    if (!confirm('「猶他的請求」已經推送過了，確定要再推送一次嗎？')) return;
+  } else {
+    if (!confirm('確定要推送「猶他的請求」給所有組嗎？\n訊息會出現在每組的對話視窗。')) return;
+  }
+  btn.disabled = true;
+  try {
+    await pushYutaMessageToAllGroups(YUTA_REQUEST_TEXT);
+    btn.classList.add('sent');
+    showYutaStatus('✓ 猶他的請求已推送到所有組');
+  } catch(e) {
+    showYutaStatus('推送失敗，請再試', 'var(--red)');
+  } finally {
+    btn.disabled = false;
+  }
+};
+
+window.sendYutaFarewell = async function() {
+  const btn = document.getElementById('yuta-farewell-btn');
+  if (btn.classList.contains('sent')) {
+    if (!confirm('「猶他的最後話」已經推送過了，確定要再推送一次嗎？')) return;
+  } else {
+    if (!confirm('確定要推送「猶他的最後話」給所有組嗎？\n訊息會出現在每組的對話視窗。')) return;
+  }
+  btn.disabled = true;
+  try {
+    await pushYutaMessageToAllGroups(YUTA_FAREWELL_TEXT);
+    btn.classList.add('sent');
+    showYutaStatus('✓ 猶他的最後話已推送到所有組');
+  } catch(e) {
+    showYutaStatus('推送失敗，請再試', 'var(--red)');
+  } finally {
+    btn.disabled = false;
+  }
+};
+
+window.sendYutaLeave = async function() {
+  const btn = document.getElementById('yuta-leave-btn');
+  const ok = confirm(
+    '⚠️ 確定要讓猶他離場嗎？\n\n' +
+    '• 所有組的平板將顯示告別畫面，無法再對話。\n' +
+    '• 此動作無法撤回（除非按「清除所有對話記錄」重置整場）。\n\n' +
+    '請確認時機正確（第二天 15:20 平板熄滅段）。'
+  );
+  if (!ok) return;
+  btn.disabled = true;
+  try {
+    await set(ref(db, 'global_state/yuta_active'), false);
+    btn.classList.add('sent');
+    btn.innerHTML = '🌙 猶他已離場 <span class="yuta-btn-time">所有平板已熄滅</span>';
+    showYutaStatus('✓ 猶他已離場，所有平板進入告別畫面');
+  } catch(e) {
+    showYutaStatus('離場失敗，請再試', 'var(--red)');
+    btn.disabled = false;
+  }
 };
 
 function escHtml(s) {

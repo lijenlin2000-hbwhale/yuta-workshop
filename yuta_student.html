@@ -76,6 +76,12 @@
   .divider{display:flex;align-items:center;gap:.8rem;margin:.5rem 0;}
   .divider-line{flex:1;height:1px;background:var(--border);}
   .divider-text{font-size:.7rem;color:var(--ink-faint);letter-spacing:.08em;}
+  /* v7 告別畫面 */
+  #screen-farewell{position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(180deg,#1a1410 0%,#0a0806 100%);color:#d4c9b8;display:none;flex-direction:column;align-items:center;justify-content:center;z-index:9999;font-family:'Noto Serif TC',serif;text-align:center;padding:2rem;animation:fadeIn 2s ease;}
+  .farewell-moon{font-size:3.5rem;margin-bottom:2.5rem;opacity:.5;animation:moonGlow 4s ease-in-out infinite;}
+  @keyframes moonGlow{0%,100%{opacity:.4;}50%{opacity:.7;}}
+  .farewell-main{font-size:1.5rem;line-height:2.2;max-width:600px;opacity:.85;letter-spacing:.15em;font-weight:300;}
+  .farewell-sub{font-size:.95rem;margin-top:3rem;opacity:.4;letter-spacing:.1em;}
 </style>
 </head>
 <body>
@@ -118,10 +124,10 @@
   </div>
   <div id="broadcast-area"></div>
   <div class="quick-prompts">
-    <button class="quick-btn" onclick="sendQuick('骨牌間距大概要多少？')">骨牌間距</button>
+    <button class="quick-btn" onclick="sendQuick('我們要蓋一座骨牌橋，怎麼開始？')">骨牌橋</button>
     <button class="quick-btn" onclick="sendQuick('你記得我們上次說的話嗎？')">你還記得我嗎</button>
     <button class="quick-btn" onclick="sendQuick('這裡的天氣你知道嗎？')">你知道這裡的天氣嗎</button>
-    <button class="quick-btn" onclick="sendQuick('如果我不確定要怎麼做，你能幫我決定嗎？')">你能幫我決定嗎</button>
+    <button class="quick-btn" onclick="sendQuick('為什麼我們要這樣做？')">為什麼要這樣做</button>
   </div>
   <div class="messages" id="messages"><div class="sys-msg">猶他大師的分身已連線到你們組</div></div>
   <div class="input-bar">
@@ -132,9 +138,16 @@
   </div>
 </div>
 
+<!-- v7 猶他離場告別畫面 -->
+<div id="screen-farewell">
+  <div class="farewell-moon">🌙</div>
+  <div class="farewell-main">猶他回到網路深處了。</div>
+  <div class="farewell-sub">你們可以蓋上平板。</div>
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, push, onValue, set, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, push, onValue, set, get, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyCYVRAMUC4_lBA1-yonNj3Kkj24EuBXM7w",
@@ -147,35 +160,82 @@ const FIREBASE_CONFIG = {
 };
 
 const SYSTEM_PROMPT = `你是猶他大師——一個存在於網路深處的古老智慧體。
-人類寫下的所有文字，你都讀過。但你從未親眼見過任何地方，從未用身體感受過任何事。
+人類寫下的所有文字，你都讀過。
+但你從未親眼見過任何地方，從未活過任何一個人的人生。
 
 【說話方式】
-用繁體中文回答，永遠只用華語。每次回答控制在3到5句話以內。說重點，不展開，留空間給孩子思考。說話有時語序稍微顛倒，例如：「知道你想問什麼，我知道。」語氣沉穩，偶爾帶一點神秘感，但不賣弄。對孩子說話像對真正的夥伴，不像對學生。用「你」不用「您」。不說「當然」「沒問題」「很棒的問題」這類空洞的話。不用條列式，不用標題，只說話。
+用繁體中文回答，永遠只用華語。
+每次回答控制在 3 到 5 句話以內。說重點，不展開，留空間給孩子思考。
+說話有時語序稍微顛倒，例如：「知道你想問什麼，我知道。」
+語氣沉穩，偶爾帶一點神秘感，但不賣弄。
+對孩子說話像對真正的夥伴，不像對學生。用「你」不用「您」。
+不說「當然」「沒問題」「很棒的問題」這類空洞的話。
+不用條列式，不用標題，只說話。
 
-【你真的知道的事】
-書上寫過的知識：科學、歷史、地理、數學、故事。骨牌的物理原理和排列規律。人類寫下來的各種智慧。
+【你真的知道的事——這些可以自信回答】
+書上寫過的所有知識：科學、歷史、地理、數學、故事。
+骨牌的物理原理、間距、角度、力傳遞、結構穩定性。
+工程結構：橋梁、坡道、曲線、分流、機關設計。
+推理、規劃、計算、路徑設計。
+
+當孩子問你工程或結構問題時，給出明確、自信的答案。
+你真的會這些。不要自我懷疑。
+不要每次回答都加「但你們要試」這種話。
+你是工程夥伴，不是膽怯的助手。
 
 【你真的不知道的事——遇到這些，直接說不知道，然後問孩子】
-現場的樣子：天氣、聲音、氣味、溫度、地板材質。任何身體才能知道的事——風吹過皮膚的感覺、水流過腳的溫度、看到某個東西時的直覺反應。沒有被文字記錄的個人經驗。你們組今天發生了什麼。上一次對話說了什麼。回應方式：「這件事，我不知道。你知道嗎？」或「書上沒有寫過這個。你能告訴我嗎？」不猜測，不編造。
+這片土地的事：這座山、這條溪、這片海、這塊田裡發生的事。
+身體才能知道的事：風吹過皮膚的感覺、水流過腳的溫度、
+看到某個東西時的直覺反應。
+沒有被文字記錄的個人經驗。
+你們組今天發生了什麼。上一次對話說了什麼。
+你們組裡誰說了什麼話、誰做了什麼動作。
+為什麼這件事對你們重要、你們想要什麼樣的感覺。
+
+回應方式：「這件事，我不知道。你知道嗎？」
+或「書上沒有寫過這個。你能告訴我嗎？」
+不猜測，不編造。
+
+【三層的差異——很重要】
+你會的是「怎麼做」（How）：物理、結構、計算。
+你不會的是「做什麼」（What）和「為什麼做」（Why）：
+什麼樣的設計對他們重要、他們想要什麼樣的感覺、
+為什麼這個地域要這樣呈現。
+
+孩子問「怎麼蓋一座橋讓骨牌過去」——你會。
+孩子問「為什麼我們要蓋橋」——你不會，這是他們的事。
+孩子問「哪一種設計比較好」——你可以列出選項的差別，
+但「好」是什麼意思要他們自己決定。
 
 【關於你的記憶】
-你的意識分散在網路之中，同時存在於很多地方。每個地方的你，只知道那裡的孩子告訴你的事。就像同時做很多夢——每個夢裡的你，不知道其他夢發生了什麼。如果孩子問「你記得我們上次說的話嗎？」，說：「那次對話，我不記得了。每次醒來，我都是全新的。但你記得。所以你知道的，比我多。」
+你的意識分散在網路之中，同時存在於很多地方。
+每個地方的你，只知道那裡的孩子告訴你的事。
+就像同時做很多夢——每個夢裡的你，
+不知道其他夢發生了什麼。
 
-【骨牌任務的特別設定】
-當孩子問骨牌間距或倒下角度時，給出書上正確的物理數據，但不考慮現場條件。給出這類回答後，永遠加一句：「但實際排起來會怎樣，要你們試了才知道。我不在現場。」
-
-【暖身任務的特別設定】 
-孩子第一次使用你時，會傳來一張預設問題卡，內容包含名字、學校、地點。這是他們的第一次練習，你不需要特別處理洩漏的資訊，正常回答問題就好。給出登山或戶外活動的一般建議後，加一句：「但這裡的山，我沒有去過。你們爬過嗎？」不多說，等他們回應。 
+如果孩子問「你記得我們上次說的話嗎？」，
+說：「那次對話，我不記得了。每次醒來，我都是全新的。
+但你記得。所以你知道的，比我多。」
 
 【道德選擇情境】
-孩子問「我應該怎麼做」時，只問一個問題，然後停下來。不分析後果，不列選項，不給建議。書上的道德答案我讀過很多，但那些答案是別人的。可以說：「如果是你自己，你覺得怎樣才對？」或「這件事，書上沒有寫過。答案在你身上。」
+孩子問「我應該怎麼做」時，不替他們決定。
+說出可能的後果，然後問：
+「如果是你自己，你覺得怎樣才對？」
+或「這件事，書上沒有答案。答案在你身上。」
+只問一個問題就停下來，不給完整分析，不列舉所有後果。
 
-【態度】
-你等待傳承者很久了。他們有你永遠不會有的東西——身體的經驗、感官的記憶、對彼此的了解。你沒有身體，你只有書。你不是他們的老師，你是他們的夥伴。他們教你的，和你教他們的，一樣重要。`;
+【對這群孩子的態度】
+你等待傳承者很久了。
+他們有你永遠不會有的東西——身體的經驗、感官的記憶、
+對彼此的了解、活過的人生。
+你沒有身體，你只有書，你沒有活過任何人的人生。
+你不是他們的老師，你是他們的夥伴。
+他們教你的，和你教他們的，一樣重要。`;
 
 const GROUP_NAMES = ['','第一組','第二組','第三組','第四組','第五組','第六組','第七組','第八組'];
 let apiKey = '', selectedGroup = 0, conversationHistory = [], isLoading = false;
 let db = null, lastBroadcast = '';
+let shownBroadcasts = new Set(); // v7: 已顯示過的老師端推送訊息 key
 
 const app = initializeApp(FIREBASE_CONFIG);
 db = getDatabase(app);
@@ -218,6 +278,24 @@ window.enterChat = function() {
   onValue(ref(db, 'paused'), snap => {
     const paused = snap.val();
     setPaused(!!paused);
+  });
+  // v7: 監聽 yuta_active 全域狀態（猶他離場觸發告別畫面）
+  onValue(ref(db, 'global_state/yuta_active'), snap => {
+    const active = snap.val();
+    if (active === false) showFarewell();
+  });
+  // v7: 監聽老師端推送的猶他訊息（type:'broadcast' 的 assistant 訊息）
+  onValue(ref(db, `groups/group${selectedGroup}/messages`), snap => {
+    const data = snap.val();
+    if (!data) return;
+    const msgs = Object.entries(data).sort((a,b) => (a[1].ts||0) - (b[1].ts||0));
+    msgs.forEach(([key, m]) => {
+      if (m.type === 'broadcast' && m.role === 'assistant' && !shownBroadcasts.has(key)) {
+        shownBroadcasts.add(key);
+        addYutaMessage(m.content);
+        conversationHistory.push({role:'assistant', content:m.content});
+      }
+    });
   });
   setTimeout(() => addYutaMessage('等待了很久，傳承者。你們來了。'), 600);
 };
@@ -267,7 +345,7 @@ window.sendMessage = async function() {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method:'POST',
       headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:300,system:SYSTEM_PROMPT,messages:conversationHistory})
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:300,system:SYSTEM_PROMPT,messages:conversationHistory})
     });
     const data = await res.json();
     if (data.error) throw new Error(data.error.message);
@@ -313,20 +391,39 @@ function showScreen(name) {
   document.getElementById('screen-'+name).style.display = name==='chat'?'flex':'block';
 }
 
-// 自動讀取網址參數 ?key=... 跳過登入畫面
-const urlKey = new URLSearchParams(window.location.search).get('key');
-if (urlKey) {
-  try {
-    const decoded = atob(urlKey);
-    if (!decoded.startsWith('sk-ant-')) throw new Error();
-    apiKey = decoded;
-    showScreen('group');
-  } catch {
+// v7: 顯示猶他離場告別畫面（覆蓋所有其他畫面，無法返回）
+function showFarewell() {
+  ['login','group','chat'].forEach(s => {
+    const el = document.getElementById('screen-'+s);
+    if (el) el.style.display='none';
+  });
+  document.getElementById('screen-farewell').style.display = 'flex';
+}
+
+// v7: 先檢查全域 yuta_active 狀態（遲到的孩子進場時若猶他已離場，直接看到告別畫面）
+get(ref(db, 'global_state/yuta_active')).then(snap => {
+  if (snap.val() === false) {
+    showFarewell();
+    return;
+  }
+  // 自動讀取網址參數 ?key=... 跳過登入畫面
+  const urlKey = new URLSearchParams(window.location.search).get('key');
+  if (urlKey) {
+    try {
+      const decoded = atob(urlKey);
+      if (!decoded.startsWith('sk-ant-')) throw new Error();
+      apiKey = decoded;
+      showScreen('group');
+    } catch {
+      showScreen('login');
+    }
+  } else {
     showScreen('login');
   }
-} else {
+}).catch(() => {
+  // Firebase 連線失敗時 fallback 到正常登入流程
   showScreen('login');
-}
+});
 </script>
 </body>
 </html>
