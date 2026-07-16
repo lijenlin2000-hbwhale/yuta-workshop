@@ -36,7 +36,7 @@
   .group-name{font-size:.7rem;color:var(--ink-faint);letter-spacing:.06em;}
   #screen-chat{width:100%;max-width:680px;height:100vh;display:none;flex-direction:column;animation:fadeIn .6s ease;}
   .chat-header{padding:.9rem 1.4rem;background:var(--parchment-dark);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.8rem;flex-shrink:0;}
-  .chat-avatar{width:36px;height:36px;border-radius:50%;background:var(--parchment-mid);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'Noto Serif TC',serif;font-size:1rem;color:var(--accent);flex-shrink:0;box-shadow:0 0 10px var(--glow);animation:pulse 4s ease-in-out infinite;}
+  .chat-avatar{width:36px;height:36px;border-radius:50%;background:var(--parchment-mid);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'Noto Serif TC',serif;font-size:1rem;color:var(--accent);flex-shrink:0;box-shadow:0 0 10px var(--glow);}
   .chat-header-info{flex:1;}
   .chat-header-name{font-family:'Noto Serif TC',serif;font-size:.95rem;font-weight:600;letter-spacing:.08em;}
   .chat-header-group{font-size:.72rem;color:var(--ink-faint);letter-spacing:.06em;}
@@ -76,28 +76,9 @@
   .divider{display:flex;align-items:center;gap:.8rem;margin:.5rem 0;}
   .divider-line{flex:1;height:1px;background:var(--border);}
   .divider-text{font-size:.7rem;color:var(--ink-faint);letter-spacing:.08em;}
-  /* 猶他形象：星散（待機呼吸 / 回應聚攏 / 離場消散） */
-  .yuta-sigil-host{position:relative;overflow:visible;}
-  .yuta-sigil{--sc:var(--accent-light);--sp:var(--accent);--sl:rgba(122,79,42,0.28);width:82%;height:82%;display:block;overflow:visible;}
-  .yuta-sigil .lnk{stroke:var(--sl);stroke-width:1.2;fill:none;transition:opacity .9s ease;}
-  .yuta-sigil .ring{transform-box:fill-box;transform-origin:center;transition:transform .7s cubic-bezier(.45,0,.2,1);}
-  .yuta-sigil .pt{fill:var(--sp);transform-box:fill-box;transform-origin:center;animation:sigTwk 5s ease-in-out infinite;transition:opacity 1.1s ease;}
-  .yuta-sigil .core{fill:var(--sc);transform-box:fill-box;transform-origin:center;animation:sigCore 4.5s ease-in-out infinite;transition:transform .6s ease,opacity 1.2s ease;}
-  .yuta-sigil .pt:nth-of-type(1){animation-delay:0s}.yuta-sigil .pt:nth-of-type(2){animation-delay:.45s}.yuta-sigil .pt:nth-of-type(3){animation-delay:.9s}.yuta-sigil .pt:nth-of-type(4){animation-delay:1.3s}.yuta-sigil .pt:nth-of-type(5){animation-delay:1.7s}.yuta-sigil .pt:nth-of-type(6){animation-delay:2.1s}.yuta-sigil .pt:nth-of-type(7){animation-delay:2.5s}.yuta-sigil .pt:nth-of-type(8){animation-delay:2.9s}
-  @keyframes sigTwk{0%,100%{opacity:.2;transform:scale(.78)}50%{opacity:1;transform:scale(1.18)}}
-  @keyframes sigCore{0%,100%{opacity:.7}50%{opacity:1}}
-  @keyframes sigCoreThink{0%,100%{opacity:.22}50%{opacity:1}}
-  .is-thinking .ring{transform:scale(.22)}
-  .is-thinking .core{transform:scale(2);animation:sigCoreThink .85s ease-in-out infinite}
-  .is-thinking .pt{animation-duration:1s}
-  .is-leaving .pt{animation:none;opacity:0}
-  .is-leaving .lnk{opacity:0}
-  .is-leaving .core{opacity:0;transition-delay:1.9s}
-  .is-leaving .ring .pt:nth-of-type(1){transition-delay:.1s}.is-leaving .ring .pt:nth-of-type(2){transition-delay:.35s}.is-leaving .ring .pt:nth-of-type(3){transition-delay:.6s}.is-leaving .ring .pt:nth-of-type(4){transition-delay:.85s}.is-leaving .ring .pt:nth-of-type(5){transition-delay:1.1s}.is-leaving .ring .pt:nth-of-type(6){transition-delay:1.35s}.is-leaving .ring .pt:nth-of-type(7){transition-delay:1.55s}.is-leaving .ring .pt:nth-of-type(8){transition-delay:1.75s}
-  #screen-farewell .yuta-sigil{--sc:#ffe1a3;--sp:#e8c07a;--sl:rgba(232,192,122,0.30)}
   /* v7 告別畫面 */
   #screen-farewell{position:fixed;top:0;left:0;width:100%;height:100%;background:linear-gradient(180deg,#1a1410 0%,#0a0806 100%);color:#d4c9b8;display:none;flex-direction:column;align-items:center;justify-content:center;z-index:9999;font-family:'Noto Serif TC',serif;text-align:center;padding:2rem;animation:fadeIn 2s ease;}
-  .farewell-moon{width:132px;height:132px;margin-bottom:2.5rem;display:flex;align-items:center;justify-content:center;}
+  .farewell-moon{font-size:3.5rem;margin-bottom:2.5rem;opacity:.5;animation:moonGlow 4s ease-in-out infinite;}
   @keyframes moonGlow{0%,100%{opacity:.4;}50%{opacity:.7;}}
   .farewell-main{font-size:1.5rem;line-height:2.2;max-width:600px;opacity:.85;letter-spacing:.15em;font-weight:300;}
   .farewell-sub{font-size:.95rem;margin-top:3rem;opacity:.4;letter-spacing:.1em;}
@@ -106,7 +87,7 @@
 <body>
 
 <div id="screen-login">
-  <div class="yuta-seal yuta-sigil-host"></div>
+  <div class="yuta-seal">師</div>
   <div class="login-title">猶他大師</div>
   <div class="login-subtitle">傳承者的試煉 · 智慧連線</div>
   <div class="divider" style="margin:1.5rem 0"><div class="divider-line"></div><div class="divider-text">輸入通關密語</div><div class="divider-line"></div></div>
@@ -116,7 +97,7 @@
 </div>
 
 <div id="screen-group">
-  <div class="yuta-seal yuta-sigil-host" style="width:56px;height:56px;margin-bottom:1rem"></div>
+  <div class="yuta-seal" style="width:56px;height:56px;font-size:1.4rem;margin-bottom:1rem">師</div>
   <div class="section-title">你是哪一組的傳承者？</div>
   <div class="section-hint">選擇你的小組，猶他大師的分身正在等待</div>
   <div class="group-grid">
@@ -134,7 +115,7 @@
 
 <div id="screen-chat">
   <div class="chat-header">
-    <div class="chat-avatar yuta-sigil-host" id="chat-sigil"></div>
+    <div class="chat-avatar">師</div>
     <div class="chat-header-info">
       <div class="chat-header-name">猶他大師</div>
       <div class="chat-header-group" id="header-group-label">——</div>
@@ -159,7 +140,7 @@
 
 <!-- v7 猶他離場告別畫面 -->
 <div id="screen-farewell">
-  <div class="farewell-moon yuta-sigil-host"></div>
+  <div class="farewell-moon">🌙</div>
   <div class="farewell-main">猶他回到網路深處了。</div>
   <div class="farewell-sub">你們可以蓋上平板。</div>
 </div>
@@ -255,12 +236,10 @@ const GROUP_NAMES = ['','第一組','第二組','第三組','第四組','第五�
 let apiKey = '', selectedGroup = 0, conversationHistory = [], isLoading = false;
 let db = null, lastBroadcast = '';
 let shownBroadcasts = new Set(); // v7: 已顯示過的老師端推送訊息 key
+let isPaused = false; // v7.1: 暫停狀態（sendMessage 最後一道防線用）
 
 const app = initializeApp(FIREBASE_CONFIG);
 db = getDatabase(app);
-
-const SIGIL_SVG = `<svg class="yuta-sigil" viewBox="0 0 100 100" aria-hidden="true"><g class="lnks"><line class="lnk" x1="50" y1="13" x2="81" y2="33"/><line class="lnk" x1="81" y1="33" x2="87" y2="59"/><line class="lnk" x1="87" y1="59" x2="65" y2="85"/><line class="lnk" x1="65" y1="85" x2="37" y2="88"/><line class="lnk" x1="37" y1="88" x2="12" y2="67"/><line class="lnk" x1="12" y1="67" x2="9" y2="37"/><line class="lnk" x1="9" y1="37" x2="31" y2="15"/><line class="lnk" x1="31" y1="15" x2="50" y2="13"/><line class="lnk" x1="50" y1="50" x2="50" y2="13"/><line class="lnk" x1="50" y1="50" x2="87" y2="59"/><line class="lnk" x1="50" y1="50" x2="12" y2="67"/></g><g class="ring"><circle class="pt" cx="50" cy="13" r="4.8"/><circle class="pt" cx="81" cy="33" r="4.2"/><circle class="pt" cx="87" cy="59" r="4.6"/><circle class="pt" cx="65" cy="85" r="3.9"/><circle class="pt" cx="37" cy="88" r="4.4"/><circle class="pt" cx="12" cy="67" r="4.6"/><circle class="pt" cx="9" cy="37" r="4.2"/><circle class="pt" cx="31" cy="15" r="3.9"/></g><circle class="core" cx="50" cy="50" r="6.5"/></svg>`;
-document.querySelectorAll('.yuta-sigil-host').forEach(el => { el.innerHTML = SIGIL_SVG; });
 
 window.doLogin = function() {
   const pw = document.getElementById('password-input').value.trim();
@@ -322,18 +301,40 @@ window.enterChat = function() {
   setTimeout(() => addYutaMessage('等待了很久，傳承者。你們來了。'), 600);
 };
 
-window.handleKey = function(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();window.sendMessage();} };
+window.handleKey = function(e) {
+  // v7.1: Enter 送出前檢查暫停狀態
+  if (isPaused) { if (e.key === 'Enter') { e.preventDefault(); flashPauseReminder(); } return; }
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();window.sendMessage();}
+};
 window.autoResize = function(el) { el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,120)+'px'; };
-window.sendQuick = function(text) { document.getElementById('msg-input').value=text; window.sendMessage(); };
+window.sendQuick = function(text) {
+  // v7.1: 快速按鈕觸發前檢查暫停狀態
+  if (isPaused) { flashPauseReminder(); return; }
+  document.getElementById('msg-input').value=text;
+  window.sendMessage();
+};
+
+// v7.1: 暫停時使用者嘗試互動——閃爍 banner 提示（溫和不刁難）
+function flashPauseReminder() {
+  const banner = document.getElementById('pause-banner');
+  if (!banner) return;
+  banner.style.transition = 'transform .15s ease';
+  banner.style.transform = 'scale(1.03)';
+  setTimeout(() => { banner.style.transform = 'scale(1)'; }, 150);
+}
 
 function setPaused(paused) {
+  isPaused = !!paused; // v7.1: 同步全域狀態，讓 sendMessage 能檢查
   const input = document.getElementById('msg-input');
   const btn = document.getElementById('send-btn');
   const area = document.getElementById('broadcast-area');
+  const quickBtns = document.querySelectorAll('.quick-btn');
   if (paused) {
     input.disabled = true;
     input.placeholder = '老師說暫停，請抬起頭來…';
     btn.disabled = true;
+    // v7.1: 也 disable 四顆快速按鈕，避免孩子繞過輸入框直接觸發
+    quickBtns.forEach(b => { b.disabled = true; b.style.opacity = '0.4'; b.style.cursor = 'not-allowed'; });
     if (!document.getElementById('pause-banner')) {
       const banner = document.createElement('div');
       banner.id = 'pause-banner';
@@ -348,6 +349,7 @@ function setPaused(paused) {
     input.disabled = false;
     input.placeholder = '問猶他大師任何事…';
     btn.disabled = false;
+    quickBtns.forEach(b => { b.disabled = false; b.style.opacity = ''; b.style.cursor = ''; });
     const pb = document.getElementById('pause-banner');
     if (pb) pb.remove();
   }
@@ -355,6 +357,11 @@ function setPaused(paused) {
 
 window.sendMessage = async function() {
   if (isLoading) return;
+  // v7.1: 最後一道防線——暫停時完全不呼叫 API、不寫入 Firebase、不加到對話歷史
+  if (isPaused) {
+    flashPauseReminder();
+    return;
+  }
   const input = document.getElementById('msg-input');
   const text = input.value.trim();
   if (!text) return;
@@ -372,6 +379,11 @@ window.sendMessage = async function() {
     const data = await res.json();
     if (data.error) throw new Error(data.error.message);
     const reply = data.content[0].text;
+    // v7.1: 送出後才被暫停——丟棄回應，不顯示、不寫入對話歷史
+    if (isPaused) {
+      conversationHistory.pop(); // 移除剛才 push 的 user 訊息（因為對話沒真的完成）
+      return;
+    }
     conversationHistory.push({role:'assistant',content:reply});
     addYutaMessage(reply);
     push(ref(db,`groups/group${selectedGroup}/messages`), {role:'assistant',content:reply,ts:serverTimestamp()});
@@ -404,7 +416,6 @@ function setLoading(v) {
   isLoading=v;
   document.getElementById('send-btn').disabled=v;
   document.getElementById('msg-input').disabled=v;
-  const cs=document.getElementById('chat-sigil'); if(cs) cs.classList.toggle('is-thinking', v);
   if(v) showTyping(); else removeTyping();
 }
 function scrollToBottom() { const m=document.getElementById('messages'); m.scrollTop=m.scrollHeight; }
@@ -421,8 +432,6 @@ function showFarewell() {
     if (el) el.style.display='none';
   });
   document.getElementById('screen-farewell').style.display = 'flex';
-  const fs=document.querySelector('#screen-farewell .yuta-sigil-host');
-  if(fs) setTimeout(()=>fs.classList.add('is-leaving'), 1500);
 }
 
 // v7: 先檢查全域 yuta_active 狀態（遲到的孩子進場時若猶他已離場，直接看到告別畫面）
